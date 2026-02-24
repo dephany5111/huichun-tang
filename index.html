@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>紙示回春堂 - 太醫院卷宗 | 專業紙質文獻修復</title>
     
-    <meta name="description" content="紙示回春堂由太醫太一主持，專精於清代宮廷紙張研究與古籍檔案保存修復。提供專業紙質修復材料與網路修復互動體驗。">
-    <meta name="keywords" content="紙示回春堂, 太醫太一, 紙質文獻修復, 清代宮廷紙張, 古籍保存維護, 圖書裝幀, 古代紙張, 檔案修復, 文獻修護工具, paper-conservation, archive-preservation">
+    <meta name="description" content="紙示回春堂由太醫太一主持，專精於清代宮廷紙張研究與古籍檔案保存修復。">
+    <meta name="keywords" content="紙示回春堂, 太醫太一, 紙質文獻修復, 清代宮廷紙張, 古籍保存維護, 圖書裝幀, paper-conservation">
     
     <style>
         :root {
@@ -47,6 +47,9 @@
         p, li { color: #333; line-height: 1.6; font-size: 0.85rem; text-align: justify; }
         .job-title { color: var(--red-stamp); font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9rem; }
         .page-num { position: absolute; bottom: 20px; right: 25px; color: var(--accent-green); font-style: italic; font-size: 0.75rem; }
+        
+        /* QR Code 特效 */
+        .official-qr { width: 120px; height: 120px; border: 3px solid var(--secondary-color); background: white; padding: 5px; margin-top: 15px; box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
     </style>
 </head>
 <body>
@@ -80,7 +83,7 @@
     <div id="donate-icon" style="font-size: 2.5rem;">🍵</div>
     <h3 style="color: var(--primary-color); margin: 0;">感謝施主！</h3>
     <p id="donate-thanks-msg" style="font-size: 0.85rem; margin-top: 10px;"></p>
-    <div style="margin: 15px 0;"><img src="donate_qr.png" alt="QR" style="width: 150px; height: 150px; border: 4px solid white;" onerror="this.style.display='none'; document.getElementById('qr-alt').style.display='flex';"><div id="qr-alt" style="display:none; width: 140px; height: 140px; background:#eee; margin:0 auto; align-items:center; justify-content:center; font-size:0.7rem; border:1px solid #ccc;">請放入 QR Code</div></div>
+    <div style="margin: 15px 0;"><img src="donate_qr.png" alt="QR" style="width: 150px; height: 150px; border: 4px solid white;" onerror="this.style.display='none'; document.getElementById('qr-alt').style.display='flex';"><div id="qr-alt" style="display:none; width: 140px; height: 140px; background:#eee; margin:0 auto; align-items:center; justify-content:center; font-size:0.7rem; border:1px solid #ccc;">請上傳 donate_qr.png</div></div>
     <button class="btn-action" onclick="closeAllModals()">領受謝意</button>
 </div>
 
@@ -97,10 +100,14 @@
             <div class="page-num">頁九</div>
         </div>
         <div class="page-back" style="background-color:var(--primary-color); display:flex; flex-direction:column; justify-content:center; align-items:center; color:var(--secondary-color); text-align: center;">
-            <img src="logo.png" style="width:250px; border:4px solid var(--secondary-color); padding:5px; margin-bottom: 20px;">
-            <p style="color: var(--gold-light); font-size: 1.4rem; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5); letter-spacing: 5px;">版權所有 翻印必究</p>
-            <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--secondary-color); width: 80%;">
-                <p style="font-size: 0.8rem;">@2026 紙示回春堂 Web Archive</p>
+            <img src="logo.png" style="width:180px; border:2px solid var(--secondary-color); padding:5px; margin-bottom: 10px;">
+            <p style="color: var(--gold-light); font-size: 1.4rem; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5); letter-spacing: 5px; margin: 10px 0;">版權所有 翻印必究</p>
+            
+            <img src="huichun_qr.png" class="official-qr" alt="紙示回春堂 QR" onerror="this.style.display='none';">
+            <p style="font-size: 0.7rem; color: var(--secondary-color); margin-top: 5px;">掃描進入紙示回春堂</p>
+
+            <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid var(--secondary-color); width: 80%;">
+                <p style="font-size: 0.75rem;">@2026 紙示回春堂 Web Archive</p>
             </div>
         </div>
     </div>
@@ -201,25 +208,12 @@
     window.onload = function() {
         const pages = Array.from(document.querySelectorAll('.page')).reverse();
         const book = document.getElementById('book');
-        
-        const updateZ = () => {
-            pages.forEach((p, i) => {
-                if (p.classList.contains('flipped')) { p.style.zIndex = i + 1; } 
-                else { p.style.zIndex = pages.length - i; }
-            });
-        };
-        
+        const updateZ = () => { pages.forEach((p, i) => { if (p.classList.contains('flipped')) { p.style.zIndex = i + 1; } else { p.style.zIndex = pages.length - i; } }); };
         updateZ();
-
         book.addEventListener('click', function(e) {
-            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input') || e.target.closest('textarea')) {
-                return;
-            }
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input') || e.target.closest('textarea')) return;
             const page = e.target.closest('.page');
-            if (page) {
-                page.classList.toggle('flipped');
-                updateZ();
-            }
+            if (page) { page.classList.toggle('flipped'); updateZ(); }
         });
     };
 
