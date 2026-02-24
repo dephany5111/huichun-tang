@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>紙示回春堂 - 太醫院卷宗</title>
+    <title>紙示回春堂 - 太醫院卷宗 | 專業紙質文獻修復</title>
+    
+    <meta name="description" content="紙示回春堂由太醫太一主持，專精於清代宮廷紙張研究與古籍檔案保存修復。提供專業紙質修復材料與網路修復互動體驗。">
+    <meta name="keywords" content="紙示回春堂, 太醫太一, 紙質文獻修復, 清代宮廷紙張, 古籍保存維護, 圖書裝幀, 古代紙張, 檔案修復, 文獻修護工具, paper-conservation, archive-preservation">
+    
     <style>
         :root {
             --primary-color: #5D2E1D; --secondary-color: #C5A059; --bg-color: #FDF5E6; 
@@ -52,22 +56,22 @@
 <div id="taiyi-modal">
     <div class="portrait-frame" style="width: 80px; height: 80px;"><img src="taiyi.png"></div>
     <h3 style="color: var(--primary-color); margin: 0;">太醫 太一：為何想議價？</h3>
-    <textarea id="taiyi-reason" placeholder="請述說理由 (如：我要養家、熱愛修復...)"></textarea>
+    <textarea id="taiyi-reason" placeholder="請述說理由..."></textarea>
     <div id="taiyi-msg" style="margin-bottom: 10px; font-weight: bold; color: var(--red-stamp); min-height: 1.2em;"></div>
     <div id="taiyi-btns-area">
-        <button class="btn-action" onclick="processTaiyi()">請點擊：請太醫開恩降價</button>
+        <button class="btn-action" onclick="processTaiyi()">請太醫開恩降價</button>
         <button class="btn-action" style="background:#999;" onclick="closeAllModals()">暫緩</button>
     </div>
 </div>
 
 <div id="longgu-modal">
     <div class="portrait-frame" style="width: 80px; height: 80px;"><img src="longgu.png"></div>
-    <h3 style="color: var(--primary-color); margin: 0;">太醫 龍骨：請出價並展現氣勢</h3>
+    <h3 style="color: var(--primary-color); margin: 0;">太醫 龍骨：請出價</h3>
     <input type="number" id="lg-price-input" placeholder="出價 (470-580)">
-    <textarea id="lg-emotion" placeholder="展現您的誠意或急迫感 (如：拜託大人！、救救古籍！...)"></textarea>
+    <textarea id="lg-emotion" placeholder="展現誠意..."></textarea>
     <div id="lg-msg" style="margin-bottom: 10px; font-weight: bold; color: var(--red-stamp); min-height: 1.2em;"></div>
     <div id="lg-btns-area">
-        <button class="btn-action" onclick="processLonggu()">請點擊：向龍骨議價</button>
+        <button class="btn-action" onclick="processLonggu()">向龍骨議價</button>
         <button class="btn-action" style="background:#999;" onclick="closeAllModals()">暫緩</button>
     </div>
 </div>
@@ -76,10 +80,7 @@
     <div id="donate-icon" style="font-size: 2.5rem;">🍵</div>
     <h3 style="color: var(--primary-color); margin: 0;">感謝施主！</h3>
     <p id="donate-thanks-msg" style="font-size: 0.85rem; margin-top: 10px;"></p>
-    <div style="margin: 15px 0;">
-        <img src="donate_qr.png" alt="QR" style="width: 150px; height: 150px; border: 4px solid white;" onerror="this.style.display='none'; document.getElementById('qr-alt').style.display='flex';">
-        <div id="qr-alt" style="display:none; width: 140px; height: 140px; background:#eee; margin:0 auto; align-items:center; justify-content:center; font-size:0.7rem; border:1px solid #ccc;">請放入 donate_qr.png</div>
-    </div>
+    <div style="margin: 15px 0;"><img src="donate_qr.png" alt="QR" style="width: 150px; height: 150px; border: 4px solid white;" onerror="this.style.display='none'; document.getElementById('qr-alt').style.display='flex';"><div id="qr-alt" style="display:none; width: 140px; height: 140px; background:#eee; margin:0 auto; align-items:center; justify-content:center; font-size:0.7rem; border:1px solid #ccc;">請放入 QR Code</div></div>
     <button class="btn-action" onclick="closeAllModals()">領受謝意</button>
 </div>
 
@@ -106,26 +107,24 @@
 
     <div class="page">
         <div class="page-front">
-            <h2>【 頁 七．材料工具販售 】</h2>
+            <h2>【 頁 七．材料工具 】</h2>
             <span class="job-title">乾式清潔用具組：</span>
-            <ul style="margin: 0; padding-left: 18px; font-size: 0.75rem; line-height: 1.3;">
+            <ul style="margin: 0; padding-left: 18px; font-size: 0.75rem;">
                 <li>紙張專用橡皮擦 / 不鏽鋼精密鑷子</li>
-                <li>2 管專業小毛刷 / 1 張 A4 化纖紙 / 1 張 A3 標記用白紙</li>
+                <li>2 管專業小毛刷 / 1 張 A4 化纖紙</li>
             </ul>
             <p id="lg-price-display" style="font-weight:bold; color:var(--primary-color); margin: 8px 0;">定價：590 元</p>
-            <div id="lg-action-area">
-                <button class="btn-action" onclick="openLonggu(event)">➤ 進入龍骨議價堂</button>
-            </div>
+            <button class="btn-action" onclick="openLonggu(event)">➤ 進入龍骨議價堂</button>
             <div id="lg-private-area" style="display:none; text-align: center;">
-                <a href="https://shopee.tw" target="_blank" class="btn-action" onclick="resetLonggu()">➤ 領取專屬價優惠卷</a>
+                <a href="https://forms.gle/eFYSS1AjcskAz4co6" target="_blank" class="btn-action">➤ 領取專屬優惠</a>
             </div>
             <div class="page-num">頁七</div>
         </div>
         <div class="page-back">
             <div style="text-align:center;">
-                <h2>【 頁 八．材料工具販售 】</h2>
+                <h2>【 頁 八．品質保證 】</h2>
                 <p style="margin-top: 40px;">本堂所選工具皆經太醫親自測試</p>
-                <p>適合古籍、字畫之初級除汙與修復</p>
+                <p>適合古籍、字畫之初級修復</p>
                 <p style="margin-top: 25px; font-size: 0.75rem; color: var(--red-stamp);">© 2026 紙示回春堂</p>
             </div>
             <div class="page-num">頁八</div>
@@ -143,12 +142,10 @@
             <h2>【 頁 六．課程報名 】</h2>
             <p><b>1. 短期課程 2日/12HR</b></p>
             <p id="ty-price-display" style="font-weight:bold; color:var(--primary-color); font-size: 1.1rem;">定價：10,000 元</p>
-            <div id="ty-action-area">
-                <button class="btn-action" onclick="openTaiyi(event)">➤ 進入太醫議價堂</button>
-                <a href="https://forms.google.com" target="_blank" class="btn-action">➤ 直接報名</a>
-            </div>
+            <button class="btn-action" onclick="openTaiyi(event)">➤ 進入太醫議價堂</button>
+            <a href="https://forms.gle/eFYSS1AjcskAz4co6" target="_blank" class="btn-action">➤ 直接報名</a>
             <div id="ty-private-area" style="display:none; text-align: center;">
-                <a href="https://forms.google.com" target="_blank" class="btn-action" onclick="resetTaiyi()">➤ 領取優惠連結報名</a>
+                <a href="https://forms.gle/eFYSS1AjcskAz4co6" target="_blank" class="btn-action">➤ 領取專屬報名連結</a>
             </div>
             <div class="page-num">頁六</div>
         </div>
@@ -201,124 +198,37 @@
 </div>
 
 <script>
-    // 1. 初始化頁面
-    const pages = Array.from(document.querySelectorAll('.page')).reverse();
-    const updateZ = () => {
-        pages.forEach((p, i) => {
-            if (p.classList.contains('flipped')) {
-                p.style.zIndex = i + 1;
-            } else {
-                p.style.zIndex = pages.length - i;
+    window.onload = function() {
+        const pages = Array.from(document.querySelectorAll('.page')).reverse();
+        const book = document.getElementById('book');
+        
+        const updateZ = () => {
+            pages.forEach((p, i) => {
+                if (p.classList.contains('flipped')) { p.style.zIndex = i + 1; } 
+                else { p.style.zIndex = pages.length - i; }
+            });
+        };
+        
+        updateZ();
+
+        book.addEventListener('click', function(e) {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input') || e.target.closest('textarea')) {
+                return;
+            }
+            const page = e.target.closest('.page');
+            if (page) {
+                page.classList.toggle('flipped');
+                updateZ();
             }
         });
-    }
-    updateZ();
+    };
 
-    // 2. 翻頁事件
-    pages.forEach((p) => {
-        p.addEventListener('click', function(e) {
-            if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('a')) return;
-            this.classList.toggle('flipped');
-            updateZ();
-        });
-    });
-
-    // 3. 通用關閉彈窗
-    function closeAllModals() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('taiyi-modal').style.display = 'none';
-        document.getElementById('longgu-modal').style.display = 'none';
-        document.getElementById('donate-modal').style.display = 'none';
-    }
-
-    // --- 4. 太一議價 (頁六) ---
-    function openTaiyi(e) {
-        e.stopPropagation();
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('taiyi-modal').style.display = 'block';
-    }
-
-    function processTaiyi() {
-        const r = document.getElementById('taiyi-reason').value;
-        const msg = document.getElementById('taiyi-msg');
-        let price = 10000;
-        
-        if (r.includes("養家") || r.includes("窮") || r.includes("養小孩")) {
-            price = 9000; msg.innerText = "太醫：體恤生活艱辛，降至 9,000 元。";
-        } else if (r.includes("熱愛修復")) {
-            price = 9200; msg.innerText = "太醫：惜才惜緣，許給予 9,200 元。";
-        } else if (r.includes("學生") || r.includes("家譜")) {
-            price = 9500; msg.innerText = "太醫：見您有心傳承，降至 9,500 元。";
-        } else {
-            price = 9800; msg.innerText = "太醫：讓利至 9,800 元。";
-        }
-
-        document.getElementById('ty-price-display').innerText = "太醫專屬價：" + price + " 元";
-        document.getElementById('ty-action-area').style.display = 'none';
-        document.getElementById('ty-private-area').style.display = 'block';
-        document.getElementById('taiyi-btns-area').innerHTML = '<button class="btn-action" onclick="closeAllModals()">遵命</button>';
-    }
-
-    function resetTaiyi() {
-        setTimeout(() => {
-            document.getElementById('ty-price-display').innerText = "定價：10,000 元";
-            document.getElementById('ty-action-area').style.display = 'block';
-            document.getElementById('ty-private-area').style.display = 'none';
-            document.getElementById('taiyi-btns-area').innerHTML = '<button class="btn-action" onclick="processTaiyi()">請點擊：請太醫開恩降價</button><button class="btn-action" style="background:#999;" onclick="closeAllModals()">暫緩</button>';
-            document.getElementById('taiyi-reason').value = "";
-            document.getElementById('taiyi-msg').innerText = "";
-        }, 800);
-    }
-
-    // --- 5. 龍骨議價 (頁七) ---
-    function openLonggu(e) {
-        e.stopPropagation();
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('longgu-modal').style.display = 'block';
-    }
-
-    function processLonggu() {
-        const p = parseInt(document.getElementById('lg-price-input').value);
-        const t = document.getElementById('lg-emotion').value;
-        const msg = document.getElementById('lg-msg');
-        
-        if (isNaN(p) || p < 470) {
-            msg.innerText = "龍骨：價格不對，本店不收奧客。"; return;
-        }
-
-        const hasRespect = (t.includes("請") || t.includes("拜託") || t.includes("謝謝") || t.includes("開恩") || t.includes("大人"));
-        const hasUrgent = (t.includes("!") || t.includes("！") || t.includes("急"));
-
-        if (p >= 550 || (p >= 500 && hasRespect) || (p >= 480 && hasUrgent) || (p >= 470 && hasRespect && t.length > 8)) {
-            document.getElementById('lg-price-display').innerText = "龍骨成交價：" + p + " 元";
-            document.getElementById('lg-action-area').style.display = 'none';
-            document.getElementById('lg-private-area').style.display = 'block';
-            document.getElementById('lg-btns-area').innerHTML = '<button class="btn-action" onclick="closeAllModals()">成交</button>';
-        } else {
-            msg.innerText = "龍骨：氣場不對，再加點錢或客氣點？";
-        }
-    }
-
-    function resetLonggu() {
-        setTimeout(() => {
-            document.getElementById('lg-price-display').innerText = "定價：590 元";
-            document.getElementById('lg-action-area').style.display = 'block';
-            document.getElementById('lg-private-area').style.display = 'none';
-            document.getElementById('lg-btns-area').innerHTML = '<button class="btn-action" onclick="processLonggu()">請點擊：向龍骨議價</button><button class="btn-action" style="background:#999;" onclick="closeAllModals()">暫緩</button>';
-            document.getElementById('lg-price-input').value = "";
-            document.getElementById('lg-emotion').value = "";
-            document.getElementById('lg-msg').innerText = "";
-        }, 800);
-    }
-
-    // --- 6. 贊助功能 (頁九) ---
-    function openDonate(e, type) {
-        e.stopPropagation();
-        const msg = document.getElementById('donate-thanks-msg');
-        msg.innerText = (type === 'tea') ? '太醫 太一：感念好茶，定加倍用心。' : '太醫 龍骨：咖啡甚暖，帳務已記下。';
-        document.getElementById('overlay').style.display = 'block';
-        document.getElementById('donate-modal').style.display = 'block';
-    }
+    function closeAllModals() { document.querySelectorAll('#taiyi-modal, #longgu-modal, #donate-modal, .modal-overlay').forEach(el => el.style.display = 'none'); }
+    function openTaiyi(e) { e.stopPropagation(); document.getElementById('overlay').style.display = 'block'; document.getElementById('taiyi-modal').style.display = 'block'; }
+    function openLonggu(e) { e.stopPropagation(); document.getElementById('overlay').style.display = 'block'; document.getElementById('longgu-modal').style.display = 'block'; }
+    function openDonate(e, type) { e.stopPropagation(); const msg = document.getElementById('donate-thanks-msg'); msg.innerText = (type === 'tea') ? '太醫 太一：感念好茶。' : '太醫 龍骨：咖啡甚暖。'; document.getElementById('overlay').style.display = 'block'; document.getElementById('donate-modal').style.display = 'block'; }
+    function processTaiyi() { const r = document.getElementById('taiyi-reason').value; const msg = document.getElementById('taiyi-msg'); let price = (r.includes("熱愛") || r.includes("修復")) ? 9200 : 9800; msg.innerText = "太醫開恩價：" + price + " 元"; document.getElementById('ty-price-display').innerText = "太醫專屬價：" + price + " 元"; document.getElementById('ty-private-area').style.display = 'block'; document.getElementById('taiyi-btns-area').innerHTML = '<button class="btn-action" onclick="closeAllModals()">遵命</button>'; }
+    function processLonggu() { const p = parseInt(document.getElementById('lg-price-input').value); const t = document.getElementById('lg-emotion').value; if (p >= 500 || (p >= 470 && t.length > 5)) { document.getElementById('lg-price-display').innerText = "龍骨成交價：" + p + " 元"; document.getElementById('lg-private-area').style.display = 'block'; document.getElementById('lg-btns-area').innerHTML = '<button class="btn-action" onclick="closeAllModals()">成交</button>'; } else { document.getElementById('lg-msg').innerText = "龍骨：誠意不足。"; } }
 </script>
 </body>
 </html>
