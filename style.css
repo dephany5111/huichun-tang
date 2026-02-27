@@ -62,3 +62,33 @@
         .coupon-capture-area { background: #fff8e7; border: 4px double var(--secondary-color); padding: 20px; margin-top: 15px; display: none; text-align: center; }
         .coupon-price { font-size: 2.2rem; color: var(--primary-color); font-weight: 900; border-top: 2px solid var(--secondary-color); border-bottom: 2px solid var(--secondary-color); margin: 12px 0; padding: 5px 0; }
         input, textarea { width: 100%; margin: 10px 0; padding: 12px; box-sizing: border-box; font-family: inherit; border: 1px solid var(--secondary-color); border-radius: 4px; }
+/* --- 紙示回春堂：去殘影專用藥方 --- */
+
+/* 1. 確保每一頁都有實色背景，防止「透印」 */
+.page-front, .page-back {
+    background-color: #fff8e7; 
+    backface-visibility: hidden; 
+    -webkit-backface-visibility: hidden;
+}
+
+/* 2. 針對影片頁面 (頁 8) 的強化 */
+.video-wrapper {
+    position: relative;
+    z-index: 5;
+    background: #000; 
+    overflow: hidden;
+}
+
+/* 3. 防止影片在翻頁過程中閃爍或留下虛影 */
+.page {
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 4. 強制隱藏翻過去的頁面標籤，避免殘留 */
+.page.flipped {
+    pointer-events: none; 
+}
+.page.flipped .page-front {
+    visibility: hidden; 
+}
