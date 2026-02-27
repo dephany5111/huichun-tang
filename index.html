@@ -191,7 +191,19 @@
         const pages = Array.from(document.querySelectorAll('.page')).reverse();
         const book = document.getElementById('book');
         const scroller = document.getElementById('mainScroller');
-        const updateZ = () => { pages.forEach((p, i) => { p.style.zIndex = p.classList.contains('flipped') ? i + 1 : pages.length - i; }); };
+        const updateZ = () => { 
+    pages.forEach((p, i) => { 
+        // 1. 維持原本的層級排序
+        p.style.zIndex = p.classList.contains('flipped') ? i + 1 : pages.length - i; 
+        
+        // 2. 核心去殘影：如果是被翻過去的頁面，強制隱藏背面
+        if (p.classList.contains('flipped')) {
+            p.style.backfaceVisibility = "hidden";
+        } else {
+            p.style.backfaceVisibility = "visible";
+        }
+    }); 
+};
         updateZ();
         book.onclick = (e) => {
             if (e.target.closest('button, a, input, textarea, iframe, .video-scroll-area')) return;
@@ -245,3 +257,4 @@
 </body>
 
 </html>
+
