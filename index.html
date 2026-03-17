@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紙示回春堂 - 太醫院卷宗 | 掌門人太一監製</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #5D2E1D; --secondary-color: #C5A059; --bg-color: #FDF5E6; 
+            --accent-green: #A3B18A; --red-stamp: #A52A2A; --gold-light: #FFD700;
+            --btn-exit: #1E40AF; 
+        }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; background-color: #2C1A12; overflow: hidden; font-family: "Noto Serif TC", serif; }
+        .scroller-container { width: 100vw; height: 100vh; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; -webkit-overflow-scrolling: touch; }
+        .canvas { min-width: 1100px; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
+        .book { width: 500px; height: 680px; position: relative; perspective: 2500px; transition: transform 0.4s ease; z-index: 10; }
+        
+        @media (max-width: 600px) { .book { transform: scale(0.65) translateX(40px) !important; transform-origin: center center; } .canvas { min-width: 950px; } }
+        @media (min-width: 601px) { .book { transform: translateX(250px); } }
+        
+        .page { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transform-origin: left; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); transform-style: preserve-3d; }
+        .page-front, .page-back { 
+            width: 100%; height: 100%; position: absolute; 
+            backface-visibility: hidden; -webkit-backface-visibility: hidden; 
+            padding: 30px 40px; box-sizing: border-box; background: var(--bg-color); 
+            border: 2px solid var(--secondary-color); border-radius: 0 20px 20px 0; 
+            box-shadow: inset -5px 0 25px rgba(0,0,0,0.15); 
+        }
+        .page-back { transform: rotateY(180deg); border-radius: 20px 0 0 20px; }
+        .flipped { transform: rotateY(-180deg); }
+
+        .page-corner { position: absolute; width: 85px; height: 85px; bottom: 0; z-index: 2000 !important; cursor: pointer; }
+        .corner-right { right: 0; border-radius: 0 0 20px 0; }
+        .corner-left { left: 0; border-radius: 0 0 0 20px; }
+        
+        .cover-atmosphere { background-color: #000 !important; padding: 0 !important; display: flex; justify-content: center; align-items: center; border: 15px double var(--secondary-color) !important; }
+        .cover-atmosphere img { width: 100%; height: 100%; object-fit: cover; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid var(--accent-green); display: inline-block; font-size: 1.1rem; margin-bottom: 8px; width: 100%; }
+        h3 { font-size: 0.9rem; color: var(--primary-color); margin: 12px 0 6px 0; border-left: 5px solid var(--secondary-color); padding-left: 8px; }
+        .job-title { color: var(--red-stamp); font-weight: bold; display: block; margin-bottom: 5px; font-size: 0.9rem;}
+        .portrait-frame { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--secondary-color); margin: 10px auto; overflow: hidden; background: white; display: flex; align-items: center; justify-content: center; }
+        .portrait-frame img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .btn-action { display: inline-block; margin: 4px 2px; padding: 8px 12px; background-color: var(--primary-color); color: var(--secondary-color); text-decoration: none; border: 2px solid var(--secondary-color); font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 0.8rem; text-align: center; }
+        .btn-line { background-color: #06C755 !important; color: white !important; border: none !important; width: 100%; margin-top: 10px; }
+        .btn-exit-blue { background-color: var(--btn-exit) !important; color: white !important; border: 1px solid #fff !important; }
+        
+        .item-row { display: flex; flex-direction: column; font-size: 0.75rem; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px; }
+        .qty-input { width: 50px !important; padding: 3px !important; margin: 0 !important; text-align: center; border: 1px solid var(--secondary-color); }
+        .price-total { font-weight: bold; color: var(--red-stamp); min-width: 80px; text-align: right; }
+        
+        .scroll-list { 
+            height: 490px; 
+            overflow-y: auto !important; 
+            -webkit-overflow-scrolling: touch; 
+            padding-right: 8px; 
+            touch-action: pan-y; 
+            position: relative;
+            z-index: 10;
+        }
+
+        .summary-box { background: #fff; border: 2px solid var(--red-stamp); padding: 10px; margin-top: 15px; border-radius: 5px; text-align: center; }
+        .total-amount-big { font-size: 1.2rem; color: var(--red-stamp); font-weight: 900; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; }
+        .modal-content { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88%; max-width: 420px; max-height: 85vh; overflow-y: auto; background: var(--bg-color); border: 5px double var(--primary-color); padding: 25px; z-index: 6000; text-align: center; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .info-box { background: #FFF8E7; border: 1px solid var(--secondary-color); padding: 15px; text-align: left; font-size: 0.9rem; margin: 15px 0; }
+        
+        .capture-area { background: #fff8e7; border: 4px double var(--secondary-color); padding: 20px; margin-top: 15px; display: none; }
+        
+        .page-num { position: absolute; bottom: 15px; right: 25px; color: var(--accent-green); font-size: 0.7rem; font-style: italic; pointer-events: none; }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; box-sizing: border-box; border: 1px solid var(--secondary-color); border-radius: 4px; font-family: inherit; }
+        .staff-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-top: 10px; }
+        .staff-card { border: 1px solid var(--secondary-color); background: white; padding: 5px; border-radius: 4px; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="overlay" onclick="closeAllModals()"></div>
+
+<div id="support-modal" class="modal-content">
+    <div style="font-size: 40px; margin-bottom: 10px;">🍵</div>
+    <div style="background: var(--secondary-color); color: white; padding: 5px; margin-bottom: 10px; font-weight: bold;">感謝施主護持！</div>
+    <div class="info-box">
+        <strong>【 匯款資訊 】</strong><br>
+        銀行代碼：700 (中華郵政)<br>
+        帳號：0311754049...
+    </div>
+    <button class="btn-action" style="background: #A3B18A; color: white; border: none; width: 100%;">填寫贊助回報</button>
+    <a href="https://lin.ee/qQiXyaRL" target="_blank" class="btn-action btn-line">加入 LINE 社群</a>
+    <button class="btn-action btn-exit-blue" style="margin-top: 15px;" onclick="closeAllModals()">離開</button>
+</div>
+
+<div id="longgu-modal" class="modal-content">
+    <div class="portrait-frame" style="width: 80px; height: 80px;"><img src="Johnson.png"></div>
+    <h3>太醫 龍骨：工具議價</h3>
+    <div id="longgu-input-area">
+        <input type="number" id="lg-price-input" placeholder="請輸入您的誠意價...">
+        <textarea id="lg-emotion" placeholder="請詳述議價理由 (滿 10 字)..."></textarea>
+        <button class="btn-action" onclick="processLonggu()">呈交大掌櫃</button>
+    </div>
+    <div id="coupon-longgu" class="capture-area">
+        <div style="color:var(--red-stamp); font-weight:bold;">【 工具開恩帖 】</div>
+        <div id="cl-amount" style="font-size:2rem; margin:10px 0;">NT$ ???</div>
+        <div id="longgu-final-reason" style="font-size:0.85rem; text-align:left; border-left:3px solid var(--accent-green); padding-left:8px;"></div>
+    </div>
+    <div id="longgu-dl-btns" style="display:none; margin-top:10px;">
+        <button class="btn-action" onclick="downloadCoupon('coupon-longgu')">⬇️ 下載憑證</button>
+    </div>
+    <button class="btn-action btn-exit-blue" style="margin-top:10px;" onclick="closeAllModals()">離開</button>
+</div>
+
+<div id="taiyi-modal" class="modal-content">
+    <div class="portrait-frame" style="width: 80px; height: 80px;"><img src="taiyi.png"></div>
+    <h3>太醫 太一：課程議價</h3>
+    <div id="taiyi-input-area">
+        <textarea id="taiyi-reason" placeholder="請詳述理由（滿 10 字）..."></textarea>
+        <button class="btn-action" onclick="processTaiyi()">請求開恩</button>
+    </div>
+    <div id="coupon-taiyi" class="capture-area">
+        <div style="color:var(--red-stamp); font-weight:bold;">【 課程開恩帖 】</div>
+        <div style="font-size:2rem; margin:10px 0;">NT$ 9,800</div>
+        <div id="taiyi-final-reason" style="font-size:0.85rem; text-align:left; border-left:3px solid var(--accent-green); padding-left:8px;"></div>
+    </div>
+    <div id="taiyi-dl-btns" style="display:none; margin-top:15px;">
+        <button class="btn-action" onclick="downloadCoupon('coupon-taiyi')">⬇️ 下載憑證</button>
+    </div>
+    <button class="btn-action btn-exit-blue" style="margin-top:10px;" onclick="closeAllModals()">離開</button>
+</div>
+
+<div id="checkout-modal" class="modal-content">
+    <div id="order-form-area">
+        <h3 style="background: var(--red-stamp); color:white; border:none;">紙示回春堂 結帳藥方</h3>
+        <div id="checkout-summary" style="text-align:left; font-size:0.8rem; margin:10px 0; border-bottom:1px solid #ccc; padding-bottom:5px;"></div>
+        <div class="total-amount-big" id="checkout-total-display">總額：$0</div>
+        <input type="text" id="ship-address" placeholder="請輸入寄送地址 (必填)...">
+        <button class="btn-action" style="width:100%; background:var(--accent-green); color:white;" onclick="generateOrderImage()">生成藥方訂單圖片</button>
+    </div>
+    <div id="capture-container">
+        <div id="order-image-box" class="capture-area" style="text-align:left;">
+            <div style="border-bottom: 2px solid var(--primary-color); text-align:center; font-weight:bold; margin-bottom:10px;">紙示回春堂 - 訂購藥方</div>
+            <div id="order-items-list" style="font-size:0.75rem;"></div>
+            <div id="order-address-display" style="font-size:0.75rem; margin-top:10px; border-top:1px dashed var(--secondary-color);"></div>
+            <div class="total-amount-big" id="order-total-display" style="text-align:right; font-size:1rem;"></div>
+            <div style="background:#fff; border:1px solid var(--secondary-color); padding:8px; font-size:0.7rem;">
+                <b>【 匯款帳號 】</b><br>
+                銀行：700 (中華郵政) / 帳號：0311754049...
+            </div>
+        </div>
+    </div>
+    <button class="btn-action btn-exit-blue" style="margin-top:10px;" onclick="closeAllModals()">返回</button>
+</div>
+
+<div class="scroller-container">
+    <div class="canvas">
+        <div class="book" id="book">
+            
+            <div class="page">
+                <div class="page-front" style="text-align:center;">
+                    <h2>【 頁 9 ．護持贊助 】</h2>
+                    <img src="logo.png" style="width:120px; margin: 20px 0;">
+                    <p style="font-size: 0.85rem; color: var(--primary-color);">您的護持，讓紙質修護技藝流傳。</p>
+                    <div style="margin-top:20px;">
+                        <button class="btn-action" onclick="openSupport(event)">🍵 請喝茶 $50</button>
+                        <button class="btn-action" onclick="openSupport(event)">☕ 請咖啡 $100</button>
+                    </div>
+                    <div class="page-num">頁 9</div>
+                    <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-back" style="background:var(--primary-color); color:var(--gold-light); text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; border: 4px solid var(--secondary-color);">
+                    <img src="logo.png" style="width:120px; margin-bottom:10px;">
+                    <p style="letter-spacing:4px; font-weight:bold; font-size: 1.1rem; margin-bottom: 25px;">版權所有 翻印必究</p>
+                    <div style="background:white; padding:12px; border-radius:12px; cursor:pointer;" onclick="window.open('https://lin.ee/qQiXyaRL')">
+                        <img src="allhuichun_qr.png" style="width:115px; display:block;">
+                    </div>
+                    <p style="font-size:0.75rem; margin-top: 20px;">紙示回春堂 太醫院卷宗</p>
+                    <div class="page-num" style="color: var(--secondary-color);">頁 10</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-front">
+                    <h2>【 頁 7 ．材料工具 】</h2>
+                    <div class="scroll-list">
+                        <h3>一、紙張材料</h3>
+                        <div class="item-row"><span>1.日本典具帖每捲750元/3.5g寬10mm*30M/</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="日本典具帖" data-price="750" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>2.薄吸水紙 A4 每10張/40元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="薄吸水紙 A4" data-price="40" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>3.薄吸水紙 A3 每10張/70元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="薄吸水紙 A3" data-price="70" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>4.厚吸水紙 A4/330g 每1張/10元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="厚吸水紙 A4" data-price="10" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>5.厚吸水紙 A3/330g 每1張/18元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="厚吸水紙 A3" data-price="18" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div style="font-size:0.7rem; color:#666; margin-bottom: 10px;">6.原色楮皮 / 7.竹紙 / 8.鹼性鳳髓宣</div>
+
+                        <h3>二、材料包</h3>
+                        <div class="item-row"><span>1.手工書材料 每包20張紙/50元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="手工書紙包" data-price="50" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>2.手工書材料(含厚紙板)/80元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="手工書含板" data-price="80" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>3.手工紙材料包/6張A4/50元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="手工紙包A4" data-price="50" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>4.輔助用紙材料包/6張A3/50元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="輔助用紙包A3" data-price="50" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+                        <div class="item-row"><span>5.各色線裝書皮紙包/6張A3/100元</span><div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="書皮紙包" data-price="100" onchange="calcTotal()"> <span class="price-total">$0</span></div></div>
+
+                        <h3>三、修復工具</h3>
+                        <span class="job-title">1. 乾式清潔用具組 (590元)</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">數量 <input type="number" class="qty-input" value="0" min="0" data-name="乾式清潔工具" data-price="590" onchange="calcTotal()"> <span class="price-total">$0</span></div>
+                        <button class="btn-action" onclick="openLonggu(event)">➤ 進入龍骨議價堂</button>
+                        
+                        <div class="summary-box">
+                            <div style="font-size:0.8rem; font-weight:bold;">【 全院總額 】</div>
+                            <div class="total-amount-big" id="grand-total-display">NT$ 0</div>
+                            <button class="btn-action" style="background:var(--red-stamp); color:white; width:90%; border:none; margin-top:5px;" onclick="openCheckout(event)">前往結帳生成藥方</button>
+                        </div>
+                    </div>
+                    <div class="page-num">頁 7</div>
+                    <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-back">
+                    <h2>【 頁 8 ．修護基本功短片 】</h2>
+                    <div class="scroll-list">
+                        </div>
+                    <div class="page-num">頁 8</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-front">
+                    <h2>【 頁 5 ．太醫 茯苓 】</h2>
+                    <div class="portrait-frame"><img src="fuling.png"></div>
+                    <span class="job-title">物料配置與影務推廣</span>
+                    <p style="font-size:0.85rem; line-height:1.6;">司職修復材料分裝及修復影片拍攝剪輯。</p>
+                    <div class="page-num">頁 5</div>
+                    <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-back">
+                    <h2>【 頁 6 ．課程報名 】</h2>
+                    <span class="job-title">短期修復課程 (12小時)</span>
+                    <div style="font-weight:bold; margin-bottom:10px;">定價：10,000 元</div>
+                    <p style="font-size:0.85rem;">太一親自傳授，涵蓋中西式紙質檔案基礎修護實務。</p>
+                    <button class="btn-action" onclick="openTaiyi(event)">➤ 進入太醫院開恩堂</button><br>
+                    <a href="https://forms.gle/eFYSS1AjcskAz4co6" target="_blank" class="btn-action">➤ 直接報名課程</a>
+                    <div class="page-num">頁 6</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-front">
+                    <h2>【 頁 3 ．太醫 半夏 】</h2>
+                    <div class="portrait-frame"><img src="summer.png"></div>
+                    <span class="job-title">網路推廣與美務設計</span>
+                    <p style="font-size:0.85rem; line-height:1.6;">負責社群維護及海報設計，回覆第一線諮詢。</p>
+                    <div class="page-num">頁 3</div>
+                    <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-back">
+                    <h2>【 頁 4 ．太醫 花椒 】</h2>
+                    <div class="portrait-frame"><img src="huajiao.png"></div>
+                    <span class="job-title">實體場務與後勤總管</span>
+                    <p style="font-size:0.85rem; line-height:1.6;">負責實體課程場務調度與後勤補給。</p>
+                    <div class="page-num">頁 4</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-front">
+                    <h2>【 頁 1 ．太醫 太一 】</h2>
+                    <div class="portrait-frame"><img src="taiyi.png"></div>
+                    <span class="job-title">紙示回春堂 掌門人</span>
+                    <p style="font-size:0.85rem; line-height:1.6;">統籌全院規劃，精研古代與近代檔案修復技術。</p>
+                    <div class="page-num">頁 1</div>
+                    <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-back">
+                    <h2>【 頁 2 ．太醫 龍骨 】</h2>
+                    <div class="portrait-frame"><img src="Johnson.png"></div>
+                    <span class="job-title">大掌櫃與財務總管</span>
+                    <p style="font-size:0.85rem; line-height:1.6;">掌管堂內財務控管、專業修復工具販售。</p>
+                    <div class="page-num">頁 2</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="page-front cover-atmosphere"><img src="封面logo.png"></div>
+                <div class="page-back">
+                    <h2>【 太醫院組織圖 】</h2>
+                    <div style="text-align:center; margin-top:20px;">
+                        <div style="background:var(--primary-color); color:var(--gold-light); display:inline-block; padding:10px 20px; border-radius:10px; font-weight:bold;">掌門人：太一</div>
+                        <div class="staff-grid">
+                            <div class="staff-card"><b>龍骨</b><br>大掌櫃與財務總管</div>
+                            <div class="staff-card"><b>半夏</b><br>網路推廣與美務設計</div>
+                            <div class="staff-card"><b>花椒</b><br>實體場務與後勤總管</div>
+                            <div class="staff-card"><b>茯苓</b><br>物料配置與影務推廣</div>
+                        </div>
+                        <p style="font-style:italic; font-size:0.8rem; margin-top:40px;">「紙上回春，萬載長青」</p>
+                    </div>
+                    <div class="page-num">目錄</div>
+                    <div class="page-corner corner-left" onclick="flipPage(this)"></div>
+                </div>
+                <div class="page-corner corner-right" onclick="flipPage(this)"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // 翻頁核心邏輯
+    const pages = Array.from(document.querySelectorAll('.page')).reverse();
+    const updateZ = () => {
+        pages.forEach((p, i) => {
+            p.style.zIndex = p.classList.contains('flipped') ? i + 1 : pages.length - i;
+        });
+    };
+    updateZ();
+
+    function flipPage(cornerElement) {
+        const page = cornerElement.closest('.page');
+        page.classList.toggle('flipped');
+        updateZ();
+    }
+
+    // 手機捲動優化
+    document.querySelectorAll('.scroll-list').forEach(el => {
+        el.addEventListener('touchstart', (e) => e.stopPropagation(), {passive: true});
+        el.addEventListener('touchmove', (e) => e.stopPropagation(), {passive: true});
+        el.addEventListener('touchend', (e) => e.stopPropagation(), {passive: true});
+    });
+
+    // 計算總額
+    function calcTotal() {
+        let grand = 0;
+        document.querySelectorAll('.qty-input').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            const price = parseInt(input.getAttribute('data-price'));
+            const rowTotal = qty * price;
+            const rowDisplay = input.parentElement.querySelector('.price-total');
+            if(rowDisplay) rowDisplay.innerText = `$${rowTotal}`;
+            grand += rowTotal;
+        });
+        document.getElementById('grand-total-display').innerText = `NT$ ${grand}`;
+    }
+
+    // Modal 開關
+    function openSupport(e) { e.stopPropagation(); document.getElementById('overlay').style.display = 'block'; document.getElementById('support-modal').style.display = 'block'; }
+    function openLonggu(e) { e.stopPropagation(); document.getElementById('overlay').style.display = 'block'; document.getElementById('longgu-modal').style.display = 'block'; }
+    function openTaiyi(e) { e.stopPropagation(); document.getElementById('overlay').style.display = 'block'; document.getElementById('taiyi-modal').style.display = 'block'; }
+    function openCheckout(e) { 
+        e.stopPropagation(); 
+        let summaryHtml = "";
+        document.querySelectorAll('.qty-input').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if(qty > 0) summaryHtml += `<div>${input.getAttribute('data-name')} x ${qty}</div>`;
+        });
+        if(!summaryHtml) return alert('醫典空空，請先挑選藥材工具。');
+        document.getElementById('checkout-summary').innerHTML = summaryHtml;
+        document.getElementById('checkout-total-display').innerText = `總額：${document.getElementById('grand-total-display').innerText}`;
+        document.getElementById('overlay').style.display = 'block'; 
+        document.getElementById('checkout-modal').style.display = 'block'; 
+    }
+    function closeAllModals() { document.querySelectorAll('.modal-content, .modal-overlay').forEach(el => el.style.display = 'none'); }
+
+    // 議價與訂單生成邏輯
+    function processLonggu() {
+        const p = document.getElementById('lg-price-input').value;
+        const e = document.getElementById('lg-emotion').value;
+        if(p && e.length >= 10) {
+            document.getElementById('cl-amount').innerText = `NT$ ${p}`;
+            document.getElementById('longgu-final-reason').innerText = `理由：${e}`;
+            document.getElementById('longgu-input-area').style.display = 'none';
+            document.getElementById('coupon-longgu').style.display = 'block';
+            document.getElementById('longgu-dl-btns').style.display = 'block';
+        }
+    }
+    function processTaiyi() {
+        const e = document.getElementById('taiyi-reason').value;
+        if(e.length >= 10) {
+            document.getElementById('taiyi-final-reason').innerText = `開恩理由：${e}`;
+            document.getElementById('taiyi-input-area').style.display = 'none';
+            document.getElementById('coupon-taiyi').style.display = 'block';
+            document.getElementById('taiyi-dl-btns').style.display = 'block';
+        }
+    }
+    function generateOrderImage() {
+        const addr = document.getElementById('ship-address').value;
+        if(!addr) return alert('請輸入地址');
+        document.getElementById('order-items-list').innerHTML = document.getElementById('checkout-summary').innerHTML;
+        document.getElementById('order-address-display').innerText = `地址：${addr}`;
+        document.getElementById('order-total-display').innerText = document.getElementById('checkout-total-display').innerText;
+        const target = document.getElementById('order-image-box');
+        target.style.display = 'block';
+        html2canvas(target).then(canvas => {
+            const img = new Image(); img.src = canvas.toDataURL(); img.style.width="100%";
+            target.innerHTML = ""; target.appendChild(img);
+            document.getElementById('order-form-area').style.display='none';
+        });
+    }
+    function downloadCoupon(id) {
+        html2canvas(document.getElementById(id)).then(canvas => {
+            const link = document.createElement('a'); link.download = '回春堂憑證.png'; link.href = canvas.toDataURL(); link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
